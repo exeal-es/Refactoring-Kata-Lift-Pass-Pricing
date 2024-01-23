@@ -17,118 +17,129 @@ import java.util.Date;
 
 public class Prices {
 
-    public static Connection createApp() throws SQLException {
+  public static Connection createApp() throws SQLException {
 
-        final Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/lift_pass", "root", "mysql");
+    final Connection connection =
+        DriverManager.getConnection("jdbc:mysql://localhost:3306/lift_pass", "root", "mysql");
 
-        port(4567);
+    port(4567);
 
-        put("/prices", (req, res) -> {
-            int liftPassCost = Integer.parseInt(req.queryParams("cost"));
-            String liftPassType = req.queryParams("type");
+    put(
+        "/prices",
+        (req, res) -> {
+          int liftPassCost = Integer.parseInt(req.queryParams("cost"));
+          String liftPassType = req.queryParams("type");
 
-            try (PreparedStatement stmt = connection.prepareStatement( //
-                    "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
-                    "ON DUPLICATE KEY UPDATE cost = ?")) {
-                stmt.setString(1, liftPassType);
-                stmt.setInt(2, liftPassCost);
-                stmt.setInt(3, liftPassCost);
-                stmt.execute();
-            }
+          try (PreparedStatement stmt =
+              connection.prepareStatement( //
+                  "INSERT INTO base_price (type, cost) VALUES (?, ?) "
+                      + //
+                      "ON DUPLICATE KEY UPDATE cost = ?")) {
+            stmt.setString(1, liftPassType);
+            stmt.setInt(2, liftPassCost);
+            stmt.setInt(3, liftPassCost);
+            stmt.execute();
+          }
 
-            return "";
+          return "";
         });
 
-        get("/prices", (req, res) -> {
-            final Integer age = req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null;
+    get(
+        "/prices",
+        (req, res) -> {
+          final Integer age =
+              req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null;
 
-            try (PreparedStatement costStmt = connection.prepareStatement( //
-                    "SELECT cost FROM base_price " + //
-                    "WHERE type = ?")) {
-                costStmt.setString(1, req.queryParams("type"));
-                try (ResultSet result = costStmt.executeQuery()) {
-                    result.next();
+          try (PreparedStatement costStmt =
+              connection.prepareStatement( //
+                  "SELECT cost FROM base_price "
+                      + //
+                      "WHERE type = ?")) {
+            costStmt.setString(1, req.queryParams("type"));
+            try (ResultSet result = costStmt.executeQuery()) {
+              result.next();
 
-                    int reduction;
-                    boolean isHoliday = false;
+              int reduction;
+              boolean isHoliday = false;
 
-                    if (age != null && age < 6) {
-                        return buildCost(0);
-                    } else {
-                        reduction = 0;
+              if (age != null && age < 6) {
+                return buildCost(0);
+              }
+              reduction = 0;
 
-                        if (!req.queryParams("type").equals("night")) {
-                            DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
+              if (!req.queryParams("type").equals("night")) {
+                DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                            try (PreparedStatement holidayStmt = connection.prepareStatement( //
-                                    "SELECT * FROM holidays")) {
-                                try (ResultSet holidays = holidayStmt.executeQuery()) {
+                try (PreparedStatement holidayStmt =
+                    connection.prepareStatement( //
+                        "SELECT * FROM holidays")) {
+                  try (ResultSet holidays = holidayStmt.executeQuery()) {
 
-                                    while (holidays.next()) {
-                                        Date holiday = holidays.getDate("holiday");
-                                        if (req.queryParams("date") != null) {
-                                            Date d = isoFormat.parse(req.queryParams("date"));
-                                            if (d.getYear() == holiday.getYear() && //
-                                                d.getMonth() == holiday.getMonth() && //
-                                                d.getDate() == holiday.getDate()) {
-                                                isHoliday = true;
-                                            }
-                                        }
-                                    }
-
-                                }
-                            }
-
-                            if (req.queryParams("date") != null) {
-                                Calendar calendar = Calendar.getInstance();
-                                calendar.setTime(isoFormat.parse(req.queryParams("date")));
-                                if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                                    reduction = 35;
-                                }
-                            }
-
-                            // TODO apply reduction for others
-                            if (age != null && age < 15) {
-                                return buildCost((int) Math.ceil(result.getInt("cost") * .7));
-                            } else {
-                                if (age == null) {
-                                    double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                                    return buildCost((int) Math.ceil(cost));
-                                } else {
-                                    if (age > 64) {
-                                        double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
-                                        return buildCost((int) Math.ceil(cost));
-                                    } else {
-                                        double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                                        return buildCost((int) Math.ceil(cost));
-                                    }
-                                }
-                            }
-                        } else {
-                            if (age != null) {
-                                if (age > 64) {
-                                    return buildCost((int) Math.ceil(result.getInt("cost") * .4));
-                                } else {
-                                    return buildCost(result.getInt("cost"));
-                                }
-                            } else {
-                                return buildCost(0);
-                            }
+                    while (holidays.next()) {
+                      Date holiday = holidays.getDate("holiday");
+                      if (req.queryParams("date") != null) {
+                        Date d = isoFormat.parse(req.queryParams("date"));
+                        if (d.getYear() == holiday.getYear()
+                            && //
+                            d.getMonth() == holiday.getMonth()
+                            && //
+                            d.getDate() == holiday.getDate()) {
+                          isHoliday = true;
                         }
+                      }
                     }
+                  }
                 }
+
+                if (req.queryParams("date") != null) {
+                  Calendar calendar = Calendar.getInstance();
+                  calendar.setTime(isoFormat.parse(req.queryParams("date")));
+                  if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+                    reduction = 35;
+                  }
+                }
+
+                // TODO apply reduction for others
+                if (age != null && age < 15) {
+                  return buildCost((int) Math.ceil(result.getInt("cost") * .7));
+                } else {
+                  if (age == null) {
+                    double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                    return buildCost((int) Math.ceil(cost));
+                  } else {
+                    if (age > 64) {
+                      double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
+                      return buildCost((int) Math.ceil(cost));
+                    } else {
+                      double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                      return buildCost((int) Math.ceil(cost));
+                    }
+                  }
+                }
+              } else {
+                if (age != null) {
+                  if (age > 64) {
+                    return buildCost((int) Math.ceil(result.getInt("cost") * .4));
+                  } else {
+                    return buildCost(result.getInt("cost"));
+                  }
+                } else {
+                  return buildCost(0);
+                }
+              }
             }
+          }
         });
 
-        after((req, res) -> {
-            res.type("application/json");
+    after(
+        (req, res) -> {
+          res.type("application/json");
         });
 
-        return connection;
-    }
+    return connection;
+  }
 
-    private static String buildCost(int cost) {
-        return "{ \"cost\": " + cost + "}";
-    }
-
+  private static String buildCost(int cost) {
+    return "{ \"cost\": " + cost + "}";
+  }
 }
