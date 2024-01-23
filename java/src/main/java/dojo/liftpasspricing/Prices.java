@@ -53,7 +53,7 @@ public class Prices {
                     boolean isHoliday = false;
 
                     if (age != null && age < 6) {
-                        return "{ \"cost\": 0}";
+                        return buildCost(0);
                     } else {
                         reduction = 0;
 
@@ -112,7 +112,7 @@ public class Prices {
                                     return buildCost(result.getInt("cost"));
                                 }
                             } else {
-                                return "{ \"cost\": 0}";
+                                return buildCost(0);
                             }
                         }
                     }
