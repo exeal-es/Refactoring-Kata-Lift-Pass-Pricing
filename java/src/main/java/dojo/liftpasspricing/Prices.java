@@ -82,7 +82,7 @@ public class Prices {
                             if (req.queryParams("date") != null) {
                                 Calendar calendar = Calendar.getInstance();
                                 calendar.setTime(isoFormat.parse(req.queryParams("date")));
-                                if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
+                                if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
                                     reduction = 35;
                                 }
                             }
