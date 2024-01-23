@@ -27,7 +27,7 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnFreeCostForAgeLessThan6() {
+    public void shouldBeFreeForChildren() {
         JsonPath response = RestAssured.
             given().
             port(4567).
@@ -46,7 +46,7 @@ public class PricesTest {
 
 
     @Test
-    public void shouldReturnCost8ForAge65AndTypeNight() {
+    public void shouldApply60PercentDiscountForNightStaysForSeniors() {
         JsonPath response = RestAssured.
             given().
                 port(4567).
@@ -64,13 +64,13 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost19ForAgeLessThan64AndTypeNight() {
+    public void shouldNotApplyDiscountForNightStaysForAdults() {
         JsonPath response = RestAssured.
             given().
             port(4567).
             when().
             // construct some proper url parameters
-                get("/prices?type=night&age=63").
+                get("/prices?type=night&age=40").
             then().
             assertThat().
             statusCode(200).
@@ -82,7 +82,7 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost0ForAgeLessThan6AndTypeNight() {
+    public void shouldBeFreeForChildrenNightStays() {
         JsonPath response = RestAssured.
             given().
             port(4567).
@@ -101,7 +101,7 @@ public class PricesTest {
 
 
     @Test
-    public void shouldReturnCost25ForAge14AndType1Jour() {
+    public void shouldApply30PercentDiscountForTeenagers() {
         JsonPath response = RestAssured.
             given().
             port(4567).
@@ -119,13 +119,13 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost35ForAge16AndType1Jour() {
+    public void shouldNotApplyDiscountForAdults() {
         JsonPath response = RestAssured.
             given().
             port(4567).
             when().
             // construct some proper url parameters
-                get("/prices?age=16&type=1jour").
+                get("/prices?age=30&type=1jour").
             then().
             assertThat().
             statusCode(200).
@@ -137,7 +137,7 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost35ForNoAgeAndType1Jour() {
+    public void shouldNotApplyDiscountIfNotDateOrAgeProvided() {
         JsonPath response = RestAssured.
             given().
             port(4567).
@@ -155,7 +155,7 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost27ForAge70AndType1Jour() {
+    public void shouldApply25PercentDiscountForSeniors() {
         JsonPath response = RestAssured.
             given().
             port(4567).
@@ -173,7 +173,7 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost23ForDate22_01_2024AndType1Jour() {
+    public void shouldApplyReductionIfNotHolidaysAndItsMonday() {
         JsonPath response = RestAssured.
             given().
             port(4567).
@@ -191,7 +191,7 @@ public class PricesTest {
     }
 
     @Test
-    public void shouldReturnCost23ForDate2019_02_18AndType1Jour() {
+    public void shouldNotApplyReductionForHolidays() {
         JsonPath response = RestAssured.
             given().
             port(4567).
