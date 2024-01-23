@@ -59,13 +59,11 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
               result.next();
 
-              int reduction;
               boolean isHoliday = false;
 
               if (age != null && age < 6) {
                 return buildCost(0);
               }
-              reduction = 0;
 
               if (!req.queryParams("type").equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -91,6 +89,7 @@ public class Prices {
                   }
                 }
 
+                int reduction = 0;
                 if (req.queryParams("date") != null) {
                   Calendar calendar = Calendar.getInstance();
                   calendar.setTime(isoFormat.parse(req.queryParams("date")));
