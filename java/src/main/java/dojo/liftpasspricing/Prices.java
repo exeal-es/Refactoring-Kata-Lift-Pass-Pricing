@@ -68,29 +68,8 @@ public class Prices {
               if (!req.queryParams("type").equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                boolean isHoliday = false;
-                try (PreparedStatement holidayStmt =
-                    connection.prepareStatement( //
-                        "SELECT * FROM holidays")) {
-                  try (ResultSet holidays = holidayStmt.executeQuery()) {
-
-                    while (holidays.next()) {
-                      Date holiday = holidays.getDate("holiday");
-                      if (req.queryParams("date") != null) {
-                        Date d = isoFormat.parse(req.queryParams("date"));
-                        if (d.getYear() == holiday.getYear()
-                            && //
-                            d.getMonth() == holiday.getMonth()
-                            && //
-                            d.getDate() == holiday.getDate()) {
-                          isHoliday = true;
-                        }
-                      }
-                    }
-                  }
-                }
-
-                int reduction = calculateReduction(req, isoFormat, isHoliday);
+                int reduction =
+                    calculateReduction(req, isoFormat, isHoliday(req, connection, isoFormat));
 
                 // TODO apply reduction for others
                 if (age != null && age < 15) {
@@ -124,6 +103,32 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static boolean isHoliday(Request req, Connection connection, DateFormat isoFormat)
+      throws SQLException, ParseException {
+    boolean isHoliday = false;
+    try (PreparedStatement holidayStmt =
+        connection.prepareStatement( //
+            "SELECT * FROM holidays")) {
+      try (ResultSet holidays = holidayStmt.executeQuery()) {
+
+        while (holidays.next()) {
+          Date holiday = holidays.getDate("holiday");
+          if (req.queryParams("date") != null) {
+            Date d = isoFormat.parse(req.queryParams("date"));
+            if (d.getYear() == holiday.getYear()
+                && //
+                d.getMonth() == holiday.getMonth()
+                && //
+                d.getDate() == holiday.getDate()) {
+              isHoliday = true;
+            }
+          }
+        }
+      }
+    }
+    return isHoliday;
   }
 
   private static int calculateReduction(Request req, DateFormat isoFormat, boolean isHoliday)
