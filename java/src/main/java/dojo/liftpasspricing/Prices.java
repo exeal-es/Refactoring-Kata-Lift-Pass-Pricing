@@ -11,9 +11,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import spark.Request;
 
 public class Prices {
 
@@ -89,14 +91,7 @@ public class Prices {
                   }
                 }
 
-                int reduction = 0;
-                if (req.queryParams("date") != null) {
-                  Calendar calendar = Calendar.getInstance();
-                  calendar.setTime(isoFormat.parse(req.queryParams("date")));
-                  if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
-                    reduction = 35;
-                  }
-                }
+                int reduction = calculateReduction(req, isoFormat, isHoliday);
 
                 // TODO apply reduction for others
                 if (age != null && age < 15) {
@@ -130,6 +125,19 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static int calculateReduction(Request req, DateFormat isoFormat, boolean isHoliday)
+      throws ParseException {
+    int reduction = 0;
+    if (req.queryParams("date") != null) {
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(isoFormat.parse(req.queryParams("date")));
+      if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
+        reduction = 35;
+      }
+    }
+    return reduction;
   }
 
   private static boolean isSenior(Integer age) {
