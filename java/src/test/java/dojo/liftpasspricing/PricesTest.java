@@ -27,6 +27,25 @@ public class PricesTest {
     }
 
     @Test
+    public void shouldReturnFreeCostForChildren() {
+        JsonPath response = RestAssured.
+            given().
+            port(4567).
+            when().
+            // construct some proper url parameters
+                get("/prices?age=4").
+            then().
+            assertThat().
+            statusCode(200).
+            assertThat().
+            contentType("application/json").
+            extract().jsonPath();
+
+        assertEquals(0, response.getInt("cost"));
+    }
+
+
+    @Test
     public void doesSomething() {
         JsonPath response = RestAssured.
             given().
