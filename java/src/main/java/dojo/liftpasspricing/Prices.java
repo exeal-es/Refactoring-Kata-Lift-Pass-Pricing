@@ -61,8 +61,6 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
               result.next();
 
-              boolean isHoliday = false;
-
               if (age != null && age < 6) {
                 return buildCost(0);
               }
@@ -70,6 +68,7 @@ public class Prices {
               if (!req.queryParams("type").equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
+                boolean isHoliday = false;
                 try (PreparedStatement holidayStmt =
                     connection.prepareStatement( //
                         "SELECT * FROM holidays")) {
