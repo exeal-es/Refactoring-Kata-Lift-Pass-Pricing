@@ -89,27 +89,27 @@ public class Prices {
 
                             // TODO apply reduction for others
                             if (age != null && age < 15) {
-                                return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .7) + "}";
+                                return buildCost((int) Math.ceil(result.getInt("cost") * .7));
                             } else {
                                 if (age == null) {
                                     double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                                    return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
+                                    return buildCost((int) Math.ceil(cost));
                                 } else {
                                     if (age > 64) {
                                         double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
-                                        return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
+                                        return buildCost((int) Math.ceil(cost));
                                     } else {
                                         double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                                        return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
+                                        return buildCost((int) Math.ceil(cost));
                                     }
                                 }
                             }
                         } else {
                             if (age != null) {
                                 if (age > 64) {
-                                    return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .4) + "}";
+                                    return buildCost((int) Math.ceil(result.getInt("cost") * .4));
                                 } else {
-                                    return "{ \"cost\": " + result.getInt("cost") + "}";
+                                    return buildCost(result.getInt("cost"));
                                 }
                             } else {
                                 return "{ \"cost\": 0}";
@@ -125,6 +125,10 @@ public class Prices {
         });
 
         return connection;
+    }
+
+    private static String buildCost(int cost) {
+        return "{ \"cost\": " + cost + "}";
     }
 
 }
