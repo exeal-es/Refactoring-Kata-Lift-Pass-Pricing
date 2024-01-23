@@ -66,33 +66,9 @@ public class Prices {
               }
 
               if (!req.queryParams("type").equals("night")) {
-                DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                int reduction =
-                    calculateReduction(req, isoFormat, isHoliday(req, connection, isoFormat));
-
-                // TODO apply reduction for others
-                if (isTeenager(age)) {
-                  return buildCost((int) Math.ceil(result.getInt("cost") * .7));
-                }
-                if (age == null) {
-                  double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                  return buildCost((int) Math.ceil(cost));
-                }
-                if (isSenior(age)) {
-                  double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
-                  return buildCost((int) Math.ceil(cost));
-                }
-                double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                return buildCost((int) Math.ceil(cost));
+                return calculateOneJourCost(req, connection, age, result);
               }
-              if (age == null) {
-                return buildCost(0);
-              }
-              if (isSenior(age)) {
-                return buildCost((int) Math.ceil(result.getInt("cost") * .4));
-              }
-              return buildCost(result.getInt("cost"));
+              return calculateNightCost(age, result);
             }
           }
         });
@@ -103,6 +79,39 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static String calculateOneJourCost(Request req, Connection connection, Integer age, ResultSet result)
+      throws ParseException, SQLException {
+    DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+    int reduction =
+        calculateReduction(req, isoFormat, isHoliday(req, connection, isoFormat));
+
+    // TODO apply reduction for others
+    if (isTeenager(age)) {
+      return buildCost((int) Math.ceil(result.getInt("cost") * .7));
+    }
+    if (age == null) {
+      double cost = result.getInt("cost") * (1 - reduction / 100.0);
+      return buildCost((int) Math.ceil(cost));
+    }
+    if (isSenior(age)) {
+      double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
+      return buildCost((int) Math.ceil(cost));
+    }
+    double cost = result.getInt("cost") * (1 - reduction / 100.0);
+    return buildCost((int) Math.ceil(cost));
+  }
+
+  private static String calculateNightCost(Integer age, ResultSet result) throws SQLException {
+    if (age == null) {
+      return buildCost(0);
+    }
+    if (isSenior(age)) {
+      return buildCost((int) Math.ceil(result.getInt("cost") * .4));
+    }
+    return buildCost(result.getInt("cost"));
   }
 
   private static boolean isTeenager(Integer age) {
