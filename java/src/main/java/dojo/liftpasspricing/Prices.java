@@ -107,7 +107,7 @@ public class Prices {
                   double cost = result.getInt("cost") * (1 - reduction / 100.0);
                   return buildCost((int) Math.ceil(cost));
                 }
-                if (age > 64) {
+                if (isSenior(age)) {
                   double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
                   return buildCost((int) Math.ceil(cost));
                 }
@@ -115,7 +115,7 @@ public class Prices {
                 return buildCost((int) Math.ceil(cost));
               }
               if (age != null) {
-                if (age > 64) {
+                if (isSenior(age)) {
                   return buildCost((int) Math.ceil(result.getInt("cost") * .4));
                 }
                 return buildCost(result.getInt("cost"));
@@ -131,6 +131,10 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static boolean isSenior(Integer age) {
+    return age > 64;
   }
 
   private static String buildCost(int cost) {
