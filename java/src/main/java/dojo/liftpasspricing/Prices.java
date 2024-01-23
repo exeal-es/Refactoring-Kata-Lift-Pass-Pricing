@@ -61,14 +61,7 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
               result.next();
 
-              if (isChild(age)) {
-                return buildCost(0);
-              }
-
-              if (!req.queryParams("type").equals("night")) {
-                return calculateOneJourCost(req, connection, age, result);
-              }
-              return calculateNightCost(age, result);
+              return calculateCost(req, age, connection, result);
             }
           }
         });
@@ -79,6 +72,18 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static String calculateCost(Request req, Integer age, Connection connection, ResultSet result)
+      throws ParseException, SQLException {
+    if (isChild(age)) {
+      return buildCost(0);
+    }
+
+    if (!req.queryParams("type").equals("night")) {
+      return calculateOneJourCost(req, connection, age, result);
+    }
+    return calculateNightCost(age, result);
   }
 
   private static String calculateOneJourCost(Request req, Connection connection, Integer age, ResultSet result)
