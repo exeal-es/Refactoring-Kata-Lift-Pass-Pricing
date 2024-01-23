@@ -190,4 +190,22 @@ public class PricesTest {
         assertEquals(23, response.getInt("cost"));
     }
 
+    @Test
+    public void shouldReturnCost23ForDate2019_02_18AndType1Jour() {
+        JsonPath response = RestAssured.
+            given().
+            port(4567).
+            when().
+            // construct some proper url parameters
+                get("/prices?date=2019-02-18&type=1jour").
+            then().
+            assertThat().
+            statusCode(200).
+            assertThat().
+            contentType("application/json").
+            extract().jsonPath();
+
+        assertEquals(35, response.getInt("cost"));
+    }
+
 }
