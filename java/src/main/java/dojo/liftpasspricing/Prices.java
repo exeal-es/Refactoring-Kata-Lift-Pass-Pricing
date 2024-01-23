@@ -114,13 +114,13 @@ public class Prices {
                 double cost = result.getInt("cost") * (1 - reduction / 100.0);
                 return buildCost((int) Math.ceil(cost));
               }
-              if (age != null) {
-                if (isSenior(age)) {
-                  return buildCost((int) Math.ceil(result.getInt("cost") * .4));
-                }
-                return buildCost(result.getInt("cost"));
+              if (age == null) {
+                return buildCost(0);
               }
-              return buildCost(0);
+              if (isSenior(age)) {
+                return buildCost((int) Math.ceil(result.getInt("cost") * .4));
+              }
+              return buildCost(result.getInt("cost"));
             }
           }
         });
