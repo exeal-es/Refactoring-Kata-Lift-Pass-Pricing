@@ -61,7 +61,7 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
               result.next();
 
-              if (age != null && age < 6) {
+              if (isChild(age)) {
                 return buildCost(0);
               }
 
@@ -72,7 +72,7 @@ public class Prices {
                     calculateReduction(req, isoFormat, isHoliday(req, connection, isoFormat));
 
                 // TODO apply reduction for others
-                if (age != null && age < 15) {
+                if (isTeenager(age)) {
                   return buildCost((int) Math.ceil(result.getInt("cost") * .7));
                 }
                 if (age == null) {
@@ -103,6 +103,14 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static boolean isTeenager(Integer age) {
+    return age != null && age < 15;
+  }
+
+  private static boolean isChild(Integer age) {
+    return age != null && age < 6;
   }
 
   private static boolean isHoliday(Request req, Connection connection, DateFormat isoFormat)
