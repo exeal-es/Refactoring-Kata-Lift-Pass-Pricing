@@ -76,23 +76,15 @@ public class StayCalculator {
 
   private boolean isHoliday(DateFormat isoFormat, String date) throws SQLException, ParseException {
     boolean isHoliday = false;
-    List<Date> holidaysList = new ArrayList<>();
-    try (PreparedStatement holidayStmt =
-        connection.prepareStatement( //
-            "SELECT * FROM holidays")) {
-      try (ResultSet holidays = holidayStmt.executeQuery()) {
-
-        while (holidays.next()) {
-          Date holiday = holidays.getDate("holiday");
-          holidaysList.add(holiday);
-        }
-      }
-    }
+    HolidayRepository holidayRepository = new HolidayRepository(connection);
+    List<Date> holidaysList = holidayRepository.getHolidays();
     for (Date holiday : holidaysList) {
       isHoliday = isHoliday(isoFormat, date, holiday, isHoliday);
     }
     return isHoliday;
   }
+
+
 
   private static boolean isHoliday(
       DateFormat isoFormat, String date, Date holiday, boolean isHoliday) throws ParseException {
