@@ -52,9 +52,6 @@ public class StayCalculator {
   }
 
   private static Money calculateNightCost(Integer age, int baseCost) {
-    if (new Age(age).isUnknown()) {
-      return new Money(0);
-    }
     if (new Age(age).isSenior()) {
       return new Money(baseCost * .4).roundUp();
     }
