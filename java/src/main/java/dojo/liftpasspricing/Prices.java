@@ -1,6 +1,6 @@
 package dojo.liftpasspricing;
 
-import static dojo.liftpasspricing.StayCalculator.calculateCost;
+
 import static spark.Spark.after;
 import static spark.Spark.get;
 import static spark.Spark.port;
@@ -21,8 +21,11 @@ public class Prices {
 
   public static Connection createApp() throws SQLException {
 
+
     final Connection connection =
         DriverManager.getConnection("jdbc:mysql://localhost:3306/lift_pass", "root", "mysql");
+
+    StayCalculator stayCalculator = new StayCalculator(connection);
 
     port(4567);
 
@@ -64,7 +67,7 @@ public class Prices {
 
               int baseCost = hasNextResult ? result.getInt("cost") : 0;
               String date = req.queryParams("date");
-              return calculateCost(age, connection, baseCost, date, stayType);
+              return stayCalculator.calculateCost(age, baseCost, date, stayType);
             }
           }
         });

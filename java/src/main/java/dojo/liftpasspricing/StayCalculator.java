@@ -11,8 +11,17 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class StayCalculator{
-public static String calculateCost(
-      Integer age, Connection connection, int baseCost, String date, String stayType)
+
+  private final Connection connection;
+
+  public StayCalculator(Connection connection) {
+
+    this.connection = connection;
+  }
+
+
+  public String calculateCost(
+      Integer age, int baseCost, String date, String stayType)
       throws ParseException, SQLException {
     if (isChild(age)) {
       return buildCost(0);
