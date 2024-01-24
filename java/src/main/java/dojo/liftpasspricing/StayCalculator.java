@@ -1,6 +1,5 @@
 package dojo.liftpasspricing;
 
-
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -52,7 +51,7 @@ public class StayCalculator {
     return ((int) Math.ceil(cost));
   }
 
-  private static int calculateNightCost(Integer age, int baseCost) throws SQLException {
+  private static int calculateNightCost(Integer age, int baseCost) {
     if (age == null) {
       return 0;
     }
@@ -70,8 +69,6 @@ public class StayCalculator {
     }
     return isHoliday;
   }
-
-
 
   private static boolean isHoliday(
       DateFormat isoFormat, String date, Date holiday, boolean isHoliday) throws ParseException {
@@ -100,5 +97,4 @@ public class StayCalculator {
     }
     return reduction;
   }
-
 }
