@@ -20,7 +20,7 @@ public class StayCalculator {
 
   public int calculateCost(Integer age, int baseCost, String date, String stayType)
       throws ParseException, SQLException {
-    if (isChild(age)) {
+    if (new Age(age).isChild()) {
       return 0;
     }
 
@@ -64,10 +64,6 @@ public class StayCalculator {
 
   private static boolean isTeenager(Integer age) {
     return age != null && age < 15;
-  }
-
-  private static boolean isChild(Integer age) {
-    return age != null && age < 6;
   }
 
   private boolean isHoliday(DateFormat isoFormat, String date) throws SQLException, ParseException {
