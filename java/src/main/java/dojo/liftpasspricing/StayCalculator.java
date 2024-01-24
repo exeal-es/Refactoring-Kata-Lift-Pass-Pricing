@@ -17,10 +17,10 @@ public class StayCalculator {
     this.holidayRepository = holidayRepository;
   }
 
-  public int calculateCost(Integer age, int baseCost, String date, String stayType)
+  public Money calculateCost(Integer age, int baseCost, String date, String stayType)
       throws ParseException, SQLException {
     if (new Age(age).isChild()) {
-      return 0;
+      return new Money(0);
     }
 
     if (!stayType.equals("night")) {
@@ -29,7 +29,7 @@ public class StayCalculator {
     return calculateNightCost(age, baseCost);
   }
 
-  private int calculateOneJourCost(Integer age, int baseCost, String date)
+  private Money calculateOneJourCost(Integer age, int baseCost, String date)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -37,28 +37,28 @@ public class StayCalculator {
 
     // TODO apply reduction for others
     if (new Age(age).isTeenager()) {
-      return ((int) Math.ceil(baseCost * .7));
+      return new Money( baseCost * .7).roundUp();
     }
     if (age == null) {
       double cost = baseCost * (1 - reduction / 100.0);
-      return ((int) Math.ceil(cost));
+      return new Money(cost).roundUp();
     }
     if (new Age(age).isSenior()) {
       double cost = baseCost * .75 * (1 - reduction / 100.0);
-      return ((int) Math.ceil(cost));
+      return new Money(cost).roundUp();
     }
     double cost = baseCost * (1 - reduction / 100.0);
-    return ((int) Math.ceil(cost));
+    return new Money(cost).roundUp();
   }
 
-  private static int calculateNightCost(Integer age, int baseCost) {
+  private static Money calculateNightCost(Integer age, int baseCost) {
     if (age == null) {
-      return 0;
+      return new Money(0);
     }
     if (new Age(age).isSenior()) {
-      return ((int) Math.ceil(baseCost * .4));
+      return new Money(baseCost * .4).roundUp();
     }
-    return baseCost;
+    return new Money(baseCost);
   }
 
   private boolean isHoliday(DateFormat isoFormat, String date) throws SQLException, ParseException {
