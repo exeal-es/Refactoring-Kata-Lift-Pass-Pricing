@@ -61,7 +61,9 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
               boolean hasNextResult = result.next();
 
-              return calculateCost(req, age, connection, hasNextResult ? result.getInt("cost") : 0);
+              int baseCost = hasNextResult ? result.getInt("cost") : 0;
+              String date = req.queryParams("date");
+              return calculateCost(req, age, connection, baseCost, date);
             }
           }
         });
@@ -75,24 +77,25 @@ public class Prices {
   }
 
   private static String calculateCost(
-      Request req, Integer age, Connection connection, int baseCost)
+      Request req, Integer age, Connection connection, int baseCost, String date)
       throws ParseException, SQLException {
     if (isChild(age)) {
       return buildCost(0);
     }
 
     if (!req.queryParams("type").equals("night")) {
-      return calculateOneJourCost(req, connection, age, baseCost);
+      return calculateOneJourCost(req, connection, age, baseCost, date);
     }
     return calculateNightCost(age, baseCost);
   }
 
   private static String calculateOneJourCost(
-      Request req, Connection connection, Integer age, int baseCost)
+      Request req, Connection connection, Integer age, int baseCost, String date)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    int reduction = calculateReduction(req, isoFormat, isHoliday(req, connection, isoFormat));
+    int reduction = calculateReduction(req, isoFormat, isHoliday(connection, isoFormat,
+                                                                 date));
 
     // TODO apply reduction for others
     if (isTeenager(age)) {
@@ -128,7 +131,7 @@ public class Prices {
     return age != null && age < 6;
   }
 
-  private static boolean isHoliday(Request req, Connection connection, DateFormat isoFormat)
+  private static boolean isHoliday(Connection connection, DateFormat isoFormat, String date)
       throws SQLException, ParseException {
     boolean isHoliday = false;
     try (PreparedStatement holidayStmt =
@@ -138,8 +141,8 @@ public class Prices {
 
         while (holidays.next()) {
           Date holiday = holidays.getDate("holiday");
-          if (req.queryParams("date") != null) {
-            Date d = isoFormat.parse(req.queryParams("date"));
+          if (date != null) {
+            Date d = isoFormat.parse(date);
             if (d.getYear() == holiday.getYear()
                 && //
                 d.getMonth() == holiday.getMonth()
