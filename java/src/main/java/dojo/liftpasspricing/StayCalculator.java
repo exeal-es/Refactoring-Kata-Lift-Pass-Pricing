@@ -17,13 +17,13 @@ public class StayCalculator {
     this.holidayRepository = holidayRepository;
   }
 
-  public Money calculateCost(int baseCost, String date, String stayType, Age age)
+  public Money calculateCost(int baseCost, String date, Age age, StayType stayType)
       throws ParseException, SQLException {
     if (age.isChild()) {
       return new Money(0);
     }
 
-    if (!new StayType(stayType).isNight()) {
+    if (!stayType.isNight()) {
       return calculateOneJourCost(baseCost, date, age);
     }
     return calculateNightCost(baseCost, age);

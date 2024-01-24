@@ -61,7 +61,8 @@ public class Prices {
 
               int baseCost = hasNextResult ? result.getInt("cost") : 0;
               String date = req.queryParams("date");
-                Money cost = stayCalculator.calculateCost(baseCost, date, stayType, new Age(age));
+                Money cost = stayCalculator.calculateCost(baseCost, date, new Age(age),
+                                                          new StayType(stayType));
                 return buildCost(cost.asInt());
             }
           }
