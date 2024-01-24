@@ -26,17 +26,17 @@ public class StayCalculator {
     }
 
     if (!stayType.equals("night")) {
-      return calculateOneJourCost(connection, age, baseCost, date);
+      return calculateOneJourCost(age, baseCost, date);
     }
     return calculateNightCost(age, baseCost);
   }
 
-  private static String calculateOneJourCost(
-      Connection connection, Integer age, int baseCost, String date)
+  private  String calculateOneJourCost(
+      Integer age, int baseCost, String date)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    int reduction = calculateReduction(isoFormat, isHoliday(connection, isoFormat, date), date);
+    int reduction = calculateReduction(isoFormat, isHoliday(isoFormat, date), date);
 
     // TODO apply reduction for others
     if (isTeenager(age)) {
@@ -72,7 +72,7 @@ public class StayCalculator {
     return age != null && age < 6;
   }
 
-  private static boolean isHoliday(Connection connection, DateFormat isoFormat, String date)
+  private boolean isHoliday(DateFormat isoFormat, String date)
       throws SQLException, ParseException {
     boolean isHoliday = false;
     try (PreparedStatement holidayStmt =
