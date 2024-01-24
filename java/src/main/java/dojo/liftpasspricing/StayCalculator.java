@@ -23,7 +23,7 @@ public class StayCalculator {
       return new Money(0);
     }
 
-    if (!stayType.equals("night")) {
+    if (!new StayType(stayType).isNight()) {
       return calculateOneJourCost(age, baseCost, date);
     }
     return calculateNightCost(age, baseCost);
