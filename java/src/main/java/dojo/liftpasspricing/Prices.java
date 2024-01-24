@@ -10,11 +10,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class Prices {
 
@@ -23,7 +18,8 @@ public class Prices {
     final Connection connection =
         DriverManager.getConnection("jdbc:mysql://localhost:3306/lift_pass", "root", "mysql");
 
-    StayCalculator stayCalculator = new StayCalculator(connection);
+    StayCalculator stayCalculator = new StayCalculator(
+        new HolidayRepository(connection));
 
     port(4567);
 

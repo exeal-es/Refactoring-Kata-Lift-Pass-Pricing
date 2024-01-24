@@ -2,24 +2,21 @@ package dojo.liftpasspricing;
 
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 public class StayCalculator {
 
-  private final Connection connection;
+  private final HolidayRepository holidayRepository;
 
-  public StayCalculator(Connection connection) {
+  public StayCalculator(HolidayRepository holidayRepository) {
 
-    this.connection = connection;
+    this.holidayRepository = holidayRepository;
   }
 
   public int calculateCost(Integer age, int baseCost, String date, String stayType)
@@ -76,7 +73,6 @@ public class StayCalculator {
 
   private boolean isHoliday(DateFormat isoFormat, String date) throws SQLException, ParseException {
     boolean isHoliday = false;
-    HolidayRepository holidayRepository = new HolidayRepository(connection);
     List<Date> holidaysList = holidayRepository.getHolidays();
     for (Date holiday : holidaysList) {
       isHoliday = isHoliday(isoFormat, date, holiday, isHoliday);
