@@ -1,7 +1,6 @@
 package dojo.liftpasspricing;
 
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -45,7 +44,7 @@ public class StayCalculator {
       double cost = baseCost * (1 - reduction / 100.0);
       return ((int) Math.ceil(cost));
     }
-    if (isSenior(age)) {
+    if (new Age(age).isSenior()) {
       double cost = baseCost * .75 * (1 - reduction / 100.0);
       return ((int) Math.ceil(cost));
     }
@@ -57,7 +56,7 @@ public class StayCalculator {
     if (age == null) {
       return 0;
     }
-    if (isSenior(age)) {
+    if (new Age(age).isSenior()) {
       return ((int) Math.ceil(baseCost * .4));
     }
     return baseCost;
@@ -110,7 +109,4 @@ public class StayCalculator {
     return reduction;
   }
 
-  private static boolean isSenior(Integer age) {
-    return age > 64;
-  }
 }
