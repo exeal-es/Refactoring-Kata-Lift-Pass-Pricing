@@ -6,6 +6,10 @@ public class Age
 		this.age = age;
 	}
 
+	boolean isUnknown() {
+		return age == null;
+	}
+
 	boolean isTeenager() {
 		if (age == null)
 			return false;
