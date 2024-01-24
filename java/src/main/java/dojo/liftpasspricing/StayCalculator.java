@@ -17,33 +17,33 @@ public class StayCalculator {
     this.holidayRepository = holidayRepository;
   }
 
-  public Money calculateCost(Integer age, int baseCost, String date, String stayType)
+  public Money calculateCost(int baseCost, String date, String stayType, Age age)
       throws ParseException, SQLException {
-    if (new Age(age).isChild()) {
+    if (age.isChild()) {
       return new Money(0);
     }
 
     if (!new StayType(stayType).isNight()) {
-      return calculateOneJourCost(age, baseCost, date);
+      return calculateOneJourCost(baseCost, date, age);
     }
-    return calculateNightCost(age, baseCost);
+    return calculateNightCost(baseCost, age);
   }
 
-  private Money calculateOneJourCost(Integer age, int baseCost, String date)
+  private Money calculateOneJourCost(int baseCost, String date, Age age)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     int reduction = calculateReduction(isoFormat, isHoliday(isoFormat, date), date);
 
     // TODO apply reduction for others
-    if (new Age(age).isTeenager()) {
+    if (age.isTeenager()) {
       return new Money( baseCost * .7).roundUp();
     }
-    if (new Age(age).isUnknown()) {
+    if (age.isUnknown()) {
       double cost = baseCost * (1 - reduction / 100.0);
       return new Money(cost).roundUp();
     }
-    if (new Age(age).isSenior()) {
+    if (age.isSenior()) {
       double cost = baseCost * .75 * (1 - reduction / 100.0);
       return new Money(cost).roundUp();
     }
@@ -51,8 +51,8 @@ public class StayCalculator {
     return new Money(cost).roundUp();
   }
 
-  private static Money calculateNightCost(Integer age, int baseCost) {
-    if (new Age(age).isSenior()) {
+  private static Money calculateNightCost(int baseCost, Age age) {
+    if (age.isSenior()) {
       return new Money(baseCost * .4).roundUp();
     }
     return new Money(baseCost);
