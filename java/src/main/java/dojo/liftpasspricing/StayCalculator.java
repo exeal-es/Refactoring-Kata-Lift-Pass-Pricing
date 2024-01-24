@@ -1,5 +1,6 @@
 package dojo.liftpasspricing;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,8 +8,10 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class StayCalculator {
 
@@ -31,8 +34,7 @@ public class StayCalculator {
     return calculateNightCost(age, baseCost);
   }
 
-  private  int calculateOneJourCost(
-      Integer age, int baseCost, String date)
+  private int calculateOneJourCost(Integer age, int baseCost, String date)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -72,9 +74,9 @@ public class StayCalculator {
     return age != null && age < 6;
   }
 
-  private boolean isHoliday(DateFormat isoFormat, String date)
-      throws SQLException, ParseException {
+  private boolean isHoliday(DateFormat isoFormat, String date) throws SQLException, ParseException {
     boolean isHoliday = false;
+    List<Date> holidaysList = new ArrayList<>();
     try (PreparedStatement holidayStmt =
         connection.prepareStatement( //
             "SELECT * FROM holidays")) {
@@ -82,17 +84,26 @@ public class StayCalculator {
 
         while (holidays.next()) {
           Date holiday = holidays.getDate("holiday");
-          if (date != null) {
-            Date d = isoFormat.parse(date);
-            if (d.getYear() == holiday.getYear()
-                && //
-                d.getMonth() == holiday.getMonth()
-                && //
-                d.getDate() == holiday.getDate()) {
-              isHoliday = true;
-            }
-          }
+          holidaysList.add(holiday);
         }
+      }
+    }
+    for (Date holiday : holidaysList) {
+      isHoliday = isHoliday(isoFormat, date, holiday, isHoliday);
+    }
+    return isHoliday;
+  }
+
+  private static boolean isHoliday(
+      DateFormat isoFormat, String date, Date holiday, boolean isHoliday) throws ParseException {
+    if (date != null) {
+      Date d = isoFormat.parse(date);
+      if (d.getYear() == holiday.getYear()
+          && //
+          d.getMonth() == holiday.getMonth()
+          && //
+          d.getDate() == holiday.getDate()) {
+        isHoliday = true;
       }
     }
     return isHoliday;
@@ -114,6 +125,4 @@ public class StayCalculator {
   private static boolean isSenior(Integer age) {
     return age > 64;
   }
-
-
 }
