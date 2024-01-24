@@ -15,7 +15,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import spark.Request;
 
 public class Prices {
 
@@ -57,13 +56,14 @@ public class Prices {
                   "SELECT cost FROM base_price "
                       + //
                       "WHERE type = ?")) {
-            costStmt.setString(1, req.queryParams("type"));
+            String stayType = req.queryParams("type");
+            costStmt.setString(1, stayType);
             try (ResultSet result = costStmt.executeQuery()) {
               boolean hasNextResult = result.next();
 
               int baseCost = hasNextResult ? result.getInt("cost") : 0;
               String date = req.queryParams("date");
-              return calculateCost(req, age, connection, baseCost, date);
+              return calculateCost(age, connection, baseCost, date, stayType);
             }
           }
         });
@@ -77,13 +77,14 @@ public class Prices {
   }
 
   private static String calculateCost(
-      Request req, Integer age, Connection connection, int baseCost, String date)
+      Integer age, Connection connection, int baseCost, String date, String stayType)
       throws ParseException, SQLException {
     if (isChild(age)) {
       return buildCost(0);
     }
 
-    if (!req.queryParams("type").equals("night")) {
+    if (!stayType
+        .equals("night")) {
       return calculateOneJourCost(connection, age, baseCost, date);
     }
     return calculateNightCost(age, baseCost);
