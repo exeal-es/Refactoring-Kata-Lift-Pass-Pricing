@@ -65,7 +65,7 @@ public class Prices {
 
               int baseCost = hasNextResult ? result.getInt("cost") : 0;
               String date = req.queryParams("date");
-              return stayCalculator.calculateCost(age, baseCost, date, stayType);
+              return buildCost(stayCalculator.calculateCost(age, baseCost, date, stayType));
             }
           }
         });
@@ -76,5 +76,9 @@ public class Prices {
         });
 
     return connection;
+  }
+
+  private static String buildCost(int cost) {
+    return "{ \"cost\": " + cost + "}";
   }
 }

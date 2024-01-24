@@ -19,10 +19,10 @@ public class StayCalculator {
     this.connection = connection;
   }
 
-  public String calculateCost(Integer age, int baseCost, String date, String stayType)
+  public int calculateCost(Integer age, int baseCost, String date, String stayType)
       throws ParseException, SQLException {
     if (isChild(age)) {
-      return buildCost(0);
+      return 0;
     }
 
     if (!stayType.equals("night")) {
@@ -31,7 +31,7 @@ public class StayCalculator {
     return calculateNightCost(age, baseCost);
   }
 
-  private  String calculateOneJourCost(
+  private  int calculateOneJourCost(
       Integer age, int baseCost, String date)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -40,28 +40,28 @@ public class StayCalculator {
 
     // TODO apply reduction for others
     if (isTeenager(age)) {
-      return buildCost((int) Math.ceil(baseCost * .7));
+      return ((int) Math.ceil(baseCost * .7));
     }
     if (age == null) {
       double cost = baseCost * (1 - reduction / 100.0);
-      return buildCost((int) Math.ceil(cost));
+      return ((int) Math.ceil(cost));
     }
     if (isSenior(age)) {
       double cost = baseCost * .75 * (1 - reduction / 100.0);
-      return buildCost((int) Math.ceil(cost));
+      return ((int) Math.ceil(cost));
     }
     double cost = baseCost * (1 - reduction / 100.0);
-    return buildCost((int) Math.ceil(cost));
+    return ((int) Math.ceil(cost));
   }
 
-  private static String calculateNightCost(Integer age, int baseCost) throws SQLException {
+  private static int calculateNightCost(Integer age, int baseCost) throws SQLException {
     if (age == null) {
-      return buildCost(0);
+      return 0;
     }
     if (isSenior(age)) {
-      return buildCost((int) Math.ceil(baseCost * .4));
+      return ((int) Math.ceil(baseCost * .4));
     }
-    return buildCost(baseCost);
+    return baseCost;
   }
 
   private static boolean isTeenager(Integer age) {
@@ -115,7 +115,5 @@ public class StayCalculator {
     return age > 64;
   }
 
-  private static String buildCost(int cost) {
-    return "{ \"cost\": " + cost + "}";
-  }
+
 }
