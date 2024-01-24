@@ -84,18 +84,18 @@ public class Prices {
     }
 
     if (!req.queryParams("type").equals("night")) {
-      return calculateOneJourCost(req, connection, age, baseCost, date);
+      return calculateOneJourCost(connection, age, baseCost, date);
     }
     return calculateNightCost(age, baseCost);
   }
 
   private static String calculateOneJourCost(
-      Request req, Connection connection, Integer age, int baseCost, String date)
+      Connection connection, Integer age, int baseCost, String date)
       throws ParseException, SQLException {
     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    int reduction = calculateReduction(req, isoFormat, isHoliday(connection, isoFormat,
-                                                                 date));
+    int reduction = calculateReduction(isoFormat, isHoliday(connection, isoFormat,
+                                                            date), date);
 
     // TODO apply reduction for others
     if (isTeenager(age)) {
@@ -157,12 +157,12 @@ public class Prices {
     return isHoliday;
   }
 
-  private static int calculateReduction(Request req, DateFormat isoFormat, boolean isHoliday)
+  private static int calculateReduction(DateFormat isoFormat, boolean isHoliday, String date)
       throws ParseException {
     int reduction = 0;
-    if (req.queryParams("date") != null) {
+    if (date != null) {
       Calendar calendar = Calendar.getInstance();
-      calendar.setTime(isoFormat.parse(req.queryParams("date")));
+      calendar.setTime(isoFormat.parse(date));
       if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
         reduction = 35;
       }
