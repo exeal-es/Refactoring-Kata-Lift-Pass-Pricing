@@ -1,6 +1,5 @@
 package dojo.liftpasspricing;
 
-
 import static spark.Spark.after;
 import static spark.Spark.get;
 import static spark.Spark.port;
@@ -20,7 +19,6 @@ import java.util.Date;
 public class Prices {
 
   public static Connection createApp() throws SQLException {
-
 
     final Connection connection =
         DriverManager.getConnection("jdbc:mysql://localhost:3306/lift_pass", "root", "mysql");
@@ -79,5 +77,4 @@ public class Prices {
 
     return connection;
   }
-
 }
