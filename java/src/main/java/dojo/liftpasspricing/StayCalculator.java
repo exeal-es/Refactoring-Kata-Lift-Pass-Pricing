@@ -37,7 +37,7 @@ public class StayCalculator {
     int reduction = calculateReduction(isoFormat, isHoliday(isoFormat, date), date);
 
     // TODO apply reduction for others
-    if (isTeenager(age)) {
+    if (new Age(age).isTeenager()) {
       return ((int) Math.ceil(baseCost * .7));
     }
     if (age == null) {
@@ -60,10 +60,6 @@ public class StayCalculator {
       return ((int) Math.ceil(baseCost * .4));
     }
     return baseCost;
-  }
-
-  private static boolean isTeenager(Integer age) {
-    return age != null && age < 15;
   }
 
   private boolean isHoliday(DateFormat isoFormat, String date) throws SQLException, ParseException {

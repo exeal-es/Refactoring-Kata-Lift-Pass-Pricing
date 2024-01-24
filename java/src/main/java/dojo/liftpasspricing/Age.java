@@ -6,6 +6,12 @@ public class Age
 		this.age = age;
 	}
 
+	boolean isTeenager() {
+		if (age == null)
+			return false;
+		return age < 15;
+	}
+
 	boolean isChild() {
 		if (age == null)
 			return false;
